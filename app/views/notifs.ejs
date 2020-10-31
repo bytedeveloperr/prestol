@@ -1,9 +1,9 @@
 <%- layout("layouts/main"); %>
-<% if(notifs.length < 1) {%>
-	<h4 class="text-center mt-2">You do not have any nofifications yet. <i class="fa fa-bell"></i></h4>
-<%} else {%>
 <h4 class="font-weight-bold">Notifications</h4>
 <hr>
+<% if(notifs.length < 1) {%>
+	<h4 class="text-center mt-2">You do not have any nofifications yet. <i class="fa fa-bell-slash"></i></h4>
+<%} else {%>
 <div id="notifs">
 	<% notifs.map(notif => { %>
 	<div class="card text-wrap text-break">

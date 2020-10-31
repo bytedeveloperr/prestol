@@ -12,7 +12,7 @@ module.exports = {
 			return res.send("post does not exist");
 		} else {
 			let data = {
-				title: "Home",
+				title: post.data.text,
 				currentUser: req.user || null,
 				csrf: req.csrfToken(),
 				post: post.data,

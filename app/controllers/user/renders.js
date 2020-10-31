@@ -8,7 +8,7 @@ module.exports = {
 		let usersToFollow = await userService.getUsersToFollow(req.user._id);
 
 		let data = {
-			title: "Home",
+			title: user.data.fullname,
 			currentUser: req.user,
 			csrf: req.csrfToken(),
 			user: user.data,

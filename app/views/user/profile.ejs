@@ -46,7 +46,7 @@
 					<button class="btn btn-primary btn-sm float-right" data-fuser="<%= user._id %>" data-cuser="<%= currentUser._id %>" onclick="toggleFollow(this)"><%= user.followers.includes(currentUser._id) ? "unfollow" : "follow" %></button>
 				<%}%>
 			</div>
-			<p>- A software developer and creator of prestol.</p>
+			<p>- <%= user.bio ? user.bio : "" %></p>
 			<div class="d-flex">
 				<p><strong><%= user.followers.length %></strong> followers</p>
 				&nbsp; &bull; &nbsp;
@@ -54,15 +54,15 @@
 			</div>
 			<ul class="list-unstyled">
 				<li class="text-muted mb-2"><strong>Other Details</strong></li>
-				<li><strong>Gender</strong>: Male</li>
-				<li><strong>Location</strong>: 9, Isale otta</li>
+				<li><strong>Gender</strong>: <%= user.gender ? user.gender : "N/A" %></li>
+				<li><strong>Location</strong>: <%= user.location ? user.location : "N/A" %></li>
 			</ul>
 		</div>
 	</div>
 </div>
 <h4 class="font-weight-bold my-2">Posts</h4>
 <%if(user.posts.length < 1) {%>
-	<p class="font-weight-normal text-center"><%- "This user does not have posts <i class='fa fa-user'></i>" %></p>
+	<p class="font-weight-normal text-center"><%- "This user does not have posts" %></p>
 <%} else {%>
 <% user.posts.map(post =>{%>
     <%- include("../partials/post-card", { post }) %>
