@@ -19,10 +19,11 @@
 					      </div>
 					      <div class="modal-body">
 					        <form class="" method="POST" action="/user/<%= user._id %>?_method=PUT&_csrf=<%= csrf %>" enctype="multipart/form-data">
-					        	<img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80" width="100px" height="100px" class="rounded-circle">
+					        	<!-- <img src="<%= user.avatar %>" width="100px" height="100px" class="rounded-circle" id="profileImagePreview"> -->
 					        	<div class="form-group ml-2 mt-2">
-					        		<input type="file" name="profileImage" id="profileImage" class="d-none">
-					        		<label for="profileImage" class="btn btn-primary btn-sm"><i class="fa fa-photo"></i> change</label>
+					        		<label>Choose profile Image</label>
+					        		<input type="file" name="profileImage" id="profileImage" class="form-control">
+					        		<!-- <label for="profileImage" class="btn btn-primary btn-sm"><i class="fa fa-photo"></i> change</label> -->
 					        	</div>
 					        	<div class="form-group">
 					        		<label for="name">Full Name</label>
