@@ -47,7 +47,7 @@
 					<button class="btn btn-primary btn-sm float-right" data-fuser="<%= user._id %>" data-cuser="<%= currentUser._id %>" onclick="toggleFollow(this)"><%= user.followers.includes(currentUser._id) ? "unfollow" : "follow" %></button>
 				<%}%>
 			</div>
-			<p>- <%= user.bio ? user.bio : "" %></p>
+			<p>- <%- user.bio ? user.bio : "" %></p>
 			<div class="d-flex">
 				<p><strong><%= user.followers.length %></strong> followers</p>
 				&nbsp; &bull; &nbsp;
