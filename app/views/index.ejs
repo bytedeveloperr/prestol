@@ -1,0 +1,8 @@
+<%- layout("layouts/main"); %>
+ <%- include("./partials/create-post"); %>
+<% if(posts.length < 1) {%>
+	<p class="text-center">You cannot see any post, yet. try posting or follow people</p>
+<%} else {%>
+<% posts.map(post => { %>
+	<%- include("partials/post-card", { post }); %>
+<%})}%>

@@ -1,0 +1,21 @@
+<%- layout("layouts/main"); %>
+<% if(notifs.length < 1) {%>
+	<h4 class="text-center mt-2">You do not have any nofifications yet. <i class="fa fa-bell"></i></h4>
+<%} else {%>
+<h4 class="font-weight-bold">Notifications</h4>
+<hr>
+<div id="notifs">
+	<% notifs.map(notif => { %>
+	<div class="card text-wrap text-break">
+		<div class="card-body">
+			<div class="media">
+			  <img src="<%= notif.actor.avatar %>" class="mr-3 rounded-circle" width="40px" height="40px" alt="<%= notif.actor.fullname %>">
+			  <div class="media-body">
+			      <a href="#" class="text-dark mt-2" data-entity="<%= notif.entityType %>" data-notifid="<%= notif._id %>" data-entityid="<%= notif.entity._id %>" onclick="markNotifAsRead(this)"><%= notif.content %></a>
+			  </div>
+			</div>
+		</div>
+	</div>
+    <%})%>
+</div>
+<%}%>

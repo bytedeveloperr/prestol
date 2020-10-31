@@ -1,0 +1,69 @@
+<%- layout("layouts/main"); %>
+<div class="card text-wrap text-break">
+	<div  class="card-body">
+		<div class="">
+			<img src="<%= user.avatar %>" width="150px" height="150px"  />
+			
+			<div class="clearfix">
+				<h5 class="font-weight-bold mt-2 d-inline float-left"><%= user.fullname %></h5>
+				<% if(user._id.toString() === currentUser._id.toString()) {%>
+			    	<button class="btn btn-outline-primary btn-sm float-right" data-toggle="modal" data-target="#editUserModal"><i class="fa fa-edit"></i></button>
+				    <div class="modal fade" id="editUserModal" tabindex="-1" role="dialog" aria-labelledby="editUserModalLabel" aria-hidden="true">
+					  <div class="modal-dialog" role="document">
+					    <div class="modal-content">
+					      <div class="modal-header">
+					        <h5 class="modal-title" id="editUserModalLabel">Edit Account</h5>
+					        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					          <span aria-hidden="true">&times;</span>
+					        </button>
+					      </div>
+					      <div class="modal-body">
+					        <form class="" method="POST" action="/user/<%= user._id %>?_method=PUT&_csrf=<%= csrf %>" enctype="multipart/form-data">
+					        	<img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80" width="100px" height="100px" class="rounded-circle">
+					        	<div class="form-group ml-2 mt-2">
+					        		<input type="file" name="profileImage" id="profileImage" class="d-none">
+					        		<label for="profileImage" class="btn btn-primary btn-sm"><i class="fa fa-photo"></i> change</label>
+					        	</div>
+					        	<div class="form-group">
+					        		<label for="name">Full Name</label>
+					        		<input type="text" name="fullname" value="<%= user.fullname %>" class="form-control">
+					        	</div>
+					        	<div class="form-group">
+					        		<label for="bio">Bio</label>
+					        		<textarea name="bio" value="<%= user.bio %>" class="form-control"></textarea>
+					        	</div>
+					        	<div class="form-group">
+					        		<label for="loc">Location</label>
+					        		<input type="text" name="location" value="<%= user.location %>" class="form-control">
+					        	</div>
+					            <button type="submit" class="btn btn-primary">Save</button>
+					        </form>
+					      </div>
+					    </div>
+					  </div>
+					</div>
+				<%} if(user._id.toString() !== currentUser._id.toString()) { %>
+					<button class="btn btn-primary btn-sm float-right" data-fuser="<%= user._id %>" data-cuser="<%= currentUser._id %>" onclick="toggleFollow(this)"><%= user.followers.includes(currentUser._id) ? "unfollow" : "follow" %></button>
+				<%}%>
+			</div>
+			<p>- A software developer and creator of prestol.</p>
+			<div class="d-flex">
+				<p><strong><%= user.followers.length %></strong> followers</p>
+				&nbsp; &bull; &nbsp;
+				<p><strong><%= user.followings.length %></strong> followings</p>
+			</div>
+			<ul class="list-unstyled">
+				<li class="text-muted mb-2"><strong>Other Details</strong></li>
+				<li><strong>Gender</strong>: Male</li>
+				<li><strong>Location</strong>: 9, Isale otta</li>
+			</ul>
+		</div>
+	</div>
+</div>
+<h4 class="font-weight-bold my-2">Posts</h4>
+<%if(user.posts.length < 1) {%>
+	<p class="font-weight-normal text-center"><%- "This user does not have posts <i class='fa fa-user'></i>" %></p>
+<%} else {%>
+<% user.posts.map(post =>{%>
+    <%- include("../partials/post-card", { post }) %>
+<%})}%>

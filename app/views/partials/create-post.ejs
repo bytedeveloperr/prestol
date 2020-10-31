@@ -1,0 +1,25 @@
+<div class="card mb-2">
+	<div class="card-body">
+		<!-- <h4><a href="" class="text-dark">Create a post</a></h4> -->
+		<form class="" method="post" action="/post/create?_csrf=<%= csrf %>" enctype="multipart/form-data">
+			<!-- <input type="hidden" name="_csrf" value="" /> -->
+			<%- include("../messages/error"); %>
+			<%- include("../messages/success") %>
+			<textarea class="form-control mb-2" name="text" placeholder="Tell us something..."></textarea>
+			<!-- <p>Add image or video</p> -->
+			<div class="form-group d-inline mb-0">
+		        <input type="file" class="d-none" accept="image/*" name="image" id="imageFile">
+		        <label class="btn" for="imageFile"><i class="fa fa-image"></i></label>
+			</div>
+			<div class="form-group d-inline mb-0">
+		        <input type="file" class="d-none" accept="video/*" name="video" id="videoFile">
+		        <label class="btn" for="videoFile"><i class="fa fa-video-camera"></i></label>
+			</div>
+			<div class="mt-0">
+				<img hidden width="100px" height="100px" id="imagePreview"> <br />
+				<video hidden width="100px" height="100px" id="videoPreview" controls></video>
+			</div>
+			<button type="submit" class="d-block btn btn-primary">Create post</button>
+		</form>
+	</div>
+</div>

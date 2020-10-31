@@ -1,0 +1,134 @@
+<%- layout("layouts/main") %>
+
+<div class="card text-wrap text-break">
+  <div class="card-body">
+    <div class="media">
+      <img src="<%= post.user.avatar %>" class="rounded-circle align-self-start mr-3" alt="..." width="50px" height="50px">
+      <div class="media-body">
+        <h5 class="my-0"><a href="/user/<%= post.user._id %>" class="text-primary font-weight-normal"><%= post.user.fullname %></a></h5>
+        <p class="mb-3 text-muted date"><%= post.createdAt %></p>
+        <p class=""><a href="/post/<%= post._id %>" class="text-dark"><%- post.text %></a></p>
+        <div class="row">
+        <% if(post.image !== "") { %>
+            <div class="col-12">
+                <img src="<%- post.image %>" width="100%" height="300px" />
+            </div>
+        <%}%>
+        <% if(post.video !== "") { %>
+            <div class="col-12">
+                <video src="<%- post.video %>" controls width="100%" height="300px" ></video>
+            </div>
+        <%}%>
+        </div>
+        <hr />
+        <div class="d-flex justify-content-around">
+          <a onclick="toggleLike(this)" data-id="<%= post._id %>" data-liker="<%= currentUser._id %>" data-poster="<%= post.user._id %>" class="card-link text-muted btn">
+            <i class="<%= post.likers.includes(currentUser._id) ? 'fa fa-heart text-danger' : 'fa fa-heart-o' %> fa-lg"></i> 
+            <span id="commentCount"><%= post.likers.length %></span>
+          </a>
+          <a href="/post/<%= post._id %>#comments" class="btn card-link text-muted"><i class="fa fa-comment-o fa-lg"></i> <span class="commentSpan"><%= post.comments.length %></span></a>
+          <a href="#" class="btn card-link text-muted"><i class="fa fa-share fa-lg"></i> 43</a>
+          <div class="dropup">
+            <a href="#" class="btn card-link text-muted"data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-h fa-lg"></i></a>
+            <div class="dropdown-menu dropdown-menu-right">
+              <h6 class="dropdown-header text-dark">Action</h6>
+              <a href="#" class="btn" data-toggle="modal" data-target="#editPostModal">Edit</a>
+              <% if(post.user._id.toString() === currentUser._id.toString()) {%>
+                <form method="post" action="/post/<%=post._id%>?_method=DELETE">
+                  <input type="hidden" name="_csrf" value="<%= csrf %>">        
+                  <button type="submit" class="btn">Delete</button>                                                                                                     
+                </form>
+                <%}%>
+                <% if(post.user._id.toString() !== currentUser._id.toString()) {%>
+                  <a class="dropdown-item" href="#">Report post</a>
+                <%}%>
+            </div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="card" id="comments">
+  <div class="card-body">
+    <!-- <h5>comments</h5> -->
+    <%if(currentUser._id === ""){%>
+      <p class="text-muted text-center">You must be logged in to post comment</p>
+    <%} else {%>
+    <div class="media mb-3">
+      <div class="media-body">
+        <form method="POST" action="/post/<%=post._id%>/comment" id="commentForm">
+          <div id="commentResponse"></div>
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <input type="hidden" name="postId" id="postId" value="<%= post._id %>">
+          <input type="hidden" name="userId" id="userId" value="<%= currentUser._id %>">
+          <textarea class="form-control" name="comment" id="comment" placeholder="Enter comment here..."></textarea>
+          <button type="submit" class="mt-3 btn btn-primary">Comment</button>
+        </form>
+      </div>
+    </div>
+    <%}%>
+     <hr />
+    <div id="comments-area">
+      <% if(post.comments.length < 1){%>
+        <p class="text-muted text-center">No comments yet</p>
+      <%} else { post.comments.reverse().forEach(comment => {%>
+      <div class="media">
+        <img src="<%= comment.user.avatar %>" class="rounded-circle align-self-start mr-3" alt="..." width="50px" height="50px">
+          <div class="media-body">
+            <h5 class="my-0"><a href="/user/<%= comment.user._id %>" class="text-primary font-weight-normal"><%= comment.user.fullname %></a></h5>
+            <p class="mb-3 text-muted">2 hours ago</p>
+            <p class=""><%- comment.text %></p>
+            <div class="d-flex justify-content-around">
+              <a href="#" class="card-link text-muted"><i class="fa fa-heart-o fa-lg"></i> 43</a>
+              <div class="dropup">
+                <a href="#" class="card-link text-muted"data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-h fa-lg"></i></a>
+                <div class="dropdown-menu dropdown-menu-right">
+                  <h6 class="dropdown-header text-dark">Action</h6>
+                  <% if(comment.user._id.toString() === currentUser._id.toString()) {%>
+                    <form method="post" class="delete-comment">
+                      <input type="hidden" name="_csrf" value="<%= csrf %>">
+                      <input type="hidden" id="commentId" name="commentId" value="<%= comment._id %>">
+                      <input type="hidden" id="postId" name="postId" value="<%= post._id %>">
+                      <input type="hidden" id="userId" name="userId" value="<%= currentUser._id %>">
+                      <button type="submit" class="btn">Delete</button>
+                    </form>
+                    <%} else {%>
+                      <a class="dropdown-item" href="#">Report comment</a>
+                    <%}%>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>  
+    <hr />
+    <%})}%>
+    </div>
+  </div>
+</div>
+
+
+
+
+ <% if(post.user._id.toString() === currentUser._id.toString()) {%>
+<!-- Modal -->
+<div class="modal fade" id="editPostModal" tabindex="-1" aria-labelledby="editPostModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editPostModalLabel">Update Post</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      	<form method="POST" action="/post/<%=post._id%>?_method=PUT">
+      		<input type="hidden" name="_csrf" value="<%= csrf %>">
+        	<textarea name="text" rows="10" class="form-control"><%= post.text %></textarea>
+        	<button class="btn btn-primary mt-3">Update</button>
+    	</form>
+      </div>
+    </div>
+  </div>
+</div>
+<%}%>
