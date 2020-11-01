@@ -3,6 +3,7 @@ const { isEmpty, trim, escape } = require("validator");
 const PostModel = require("../models/Post");
 const UserModel = require("../models/User");
 const xss = require("xss");
+const { notify } = require("./notification");
 
 module.exports = {
 	create: async ({ files, body, user }) => {
@@ -73,6 +74,7 @@ module.exports = {
 
 			let feeds = await PostModel.find({ user: ids })
 				.populate("user")
+				.populate({ path: "original", populate: { path: "user" } })
 				.limit(10)
 				.exec();
 			return response({
@@ -93,6 +95,7 @@ module.exports = {
 		try {
 			let post = await PostModel.findOne({ _id })
 				.populate("user")
+				.populate({ path: "original", populate: { path: "user" } })
 				.populate({ path: "comments", populate: { path: "user" } })
 				.exec();
 			if (post) {
@@ -215,6 +218,47 @@ module.exports = {
 				data: null,
 				error: true,
 			});
+		}
+	},
+
+	sharePost: async (data, { io, socket }) => {
+		try {
+			let Post = new PostModel({
+				original: data.postId,
+				type: "shared",
+				user: data.sharerId,
+				text: "",
+			});
+			Post = await Post.save();
+			if (Post) {
+				let post = await PostModel.findOneAndUpdate(
+					{ _id: data.postId },
+					{ $push: { shares: Post._id } }
+				);
+				if (post) {
+					await UserModel.updateOne(
+						{ _id: data.sharerId },
+						{ $push: { posts: Post._id } }
+					);
+					io.to(socket.id).emit("sharePost", "success");
+					let notif = await notify({
+						receiver: data.userId,
+						actor: data.sharerId,
+						type: "postShare",
+						entity: { _id: Post._id },
+						entityType: "post",
+					});
+					if (!notif.error) {
+						io.to(data.userId).emit("newNotification", notif.data);
+					}
+				} else {
+					io.to(socket.io).emit("sharePost", "error");
+				}
+			} else {
+				io.to(socket.io).emit("sharePost", "error");
+			}
+		} catch (e) {
+			io.to(socket.io).emit("sharePost", "error");
 		}
 	},
 };

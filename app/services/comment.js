@@ -3,6 +3,7 @@ const CommentModel = require("../models/Comment");
 const PostModel = require("../models/Post");
 const { isEmpty, trim, escape } = require("validator");
 const xss = require("xss");
+const { notify } = require("./notification");
 
 module.exports = {
 	create: async (data, { io, socket }) => {
@@ -37,6 +38,19 @@ module.exports = {
 								"Comment posted successfully"
 							);
 							io.emit("postComment", comment);
+							let notif = await notify({
+								receiver: data.posterId,
+								actor: data.userId,
+								type: "postComment",
+								entity: { _id: data.postId },
+								entityType: "post",
+							});
+							if (!notif.error) {
+								io.to(data.userId).emit(
+									"newNotification",
+									notif.data
+								);
+							}
 						} else {
 							io.to(socket.id).emit(
 								"commentError",
@@ -56,9 +70,10 @@ module.exports = {
 					);
 				}
 			} catch (e) {
+				console.log(e);
 				io.to(socket.id).emit(
 					"commentError",
-					"A server error occured, please try again" + e
+					"A server error occured, please try again"
 				);
 			}
 		}

@@ -50,5 +50,10 @@ app.use(embedUser);
 
 app.use("/public", express.static(path.join(__dirname, "public")));
 app.use(routes);
+app.use((err, req, res, next) => {
+	if (err) {
+		res.json(err);
+	}
+});
 
 module.exports = app;

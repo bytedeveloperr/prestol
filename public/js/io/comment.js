@@ -26,10 +26,10 @@ socket.on("postComment", (comment) => {
 	div.classList.add("media");
 	div.innerHTML = `
         <div class="media">
-          <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&w=1000&q=80" class="rounded-circle align-self-start mr-3" alt="..." width="50px" height="50px">
+          <img src="${comment.user.avatar}" class="rounded-circle align-self-start mr-3" alt="${comment.user.fullname}" width="50px" height="50px">
           <div class="media-body">
             <h5 class="my-0"><a href="/user/${comment.user._id}" class="text-primary font-weight-normal">${comment.user.fullname}</a></h5>
-            <p class="mb-3 text-muted">2 hours ago</p>
+            <p class="mb-3 text-muted date">${comment.createdAt}</p>
             <p class="">${comment.text}</p>
           </div>
         </div>  
@@ -54,8 +54,9 @@ commentForm.addEventListener("submit", function (e) {
 	e.preventDefault();
 	let comment = e.target.elements.comment.value;
 	let postId = e.target.elements.postId.value;
+	let posterId = e.target.elements.posterId.value;
 	let userId = e.target.elements.userId.value;
-	let payload = { userId, postId, comment };
+	let payload = { userId, postId, posterId, comment };
 	socket.emit("createComment", payload);
 });
 

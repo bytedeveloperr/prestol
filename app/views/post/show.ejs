@@ -3,11 +3,39 @@
 <div class="card text-wrap text-break">
   <div class="card-body">
     <div class="media">
-      <img src="<%= post.user.avatar %>" class="rounded-circle align-self-start mr-3" alt="..." width="50px" height="50px">
+      <img src="<%= post.user.avatar %>" class="rounded-circle align-self-start mr-3" alt="<%= post.user.fullname %>" width="50px" height="50px">
       <div class="media-body">
-        <h5 class="my-0"><a href="/user/<%= post.user._id %>" class="text-primary font-weight-normal"><%= post.user.fullname %></a></h5>
-        <p class="mb-3 text-muted date"><%= post.createdAt %></p>
-        <p class=""><a href="/post/<%= post._id %>" class="text-dark"><%- post.text %></a></p>
+        <h5 class="my-0"><a href="/user/<%= post.user._id %>" class="text-primary font-weight-normal"><%= post.user.fullname %></a> <small class="text-muted"><%= post.type == "shared" ? "shared": "posted" %></small></h5>
+        <p class="mb-3 text-muted date"><%- post.createdAt %></p>
+    </div><!-- media body -->
+  </div>
+  <div>
+    <% if(post.type == "shared"){%>
+            <hr />
+            <div class="">
+              <div class="media">
+                <img src="<%= post.original.user.avatar %>" class="rounded-circle align-self-start mr-3" alt="<%= post.original.user.fullname %>" width="50px" height="50px">
+                <div class="media-body">
+                  <h5 class="my-0"><a href="/user/<%= post.original.user._id %>" class="text-primary font-weight-normal"><%= post.original.user.fullname %></a></h5>
+                  <p class="mb-3 text-muted date"><%- post.original.createdAt %></p>
+                </div>
+              </div>
+              <p class="truncate-post"><a href="/post/<%= post.original._id %>" class="text-dark"><%- post.original.text.length > 200 ? post.original.text.substr(0, 200) + "..." : post.original.text %></a></p>
+              <div class="row">
+              <% if(post.original.image !== "") { %>
+                  <div class="col-12">
+                      <img src="<%- post.original.image %>" width="100%" height="300px" />
+                  </div>
+              <%}%>
+              <% if(post.original.video !== "") { %>
+                  <div class="col-12">
+                      <video class="mt-2" src="<%- post.original.video %>" controls width="100%" height="300px" ></video>
+                  </div>
+              <%}%>
+              </div>
+            </div>
+        <%} else{%>
+        <p class="truncate-post"><a href="/post/<%= post._id %>" class="text-dark"><%- post.text.length > 200 ? post.text.substr(0, 200) + "..." : post.text %></a></p>
         <div class="row">
         <% if(post.image !== "") { %>
             <div class="col-12">
@@ -16,23 +44,23 @@
         <%}%>
         <% if(post.video !== "") { %>
             <div class="col-12">
-                <video src="<%- post.video %>" controls width="100%" height="300px" ></video>
+                <video class="mt-2" src="<%- post.video %>" controls width="100%" height="300px" ></video>
             </div>
         <%}%>
         </div>
+        <%}%>
         <hr />
         <div class="d-flex justify-content-around">
-          <a onclick="toggleLike(this)" data-id="<%= post._id %>" data-liker="<%= currentUser._id %>" data-poster="<%= post.user._id %>" class="card-link text-muted btn">
+          <a onclick="toggleLike(this, 'post')" data-id="<%= post._id %>" data-liker="<%= currentUser._id %>" data-poster="<%= post.user._id %>" class="card-link text-muted btn">
             <i class="<%= post.likers.includes(currentUser._id) ? 'fa fa-heart text-danger' : 'fa fa-heart-o' %> fa-lg"></i> 
             <span id="commentCount"><%= post.likers.length %></span>
           </a>
           <a href="/post/<%= post._id %>#comments" class="btn card-link text-muted"><i class="fa fa-comment-o fa-lg"></i> <span class="commentSpan"><%= post.comments.length %></span></a>
-          <a href="#" class="btn card-link text-muted"><i class="fa fa-share fa-lg"></i> 43</a>
+          <a href="#" class="card-link text-muted btn <%= post.type == "shared" ? "disabled": "" %>" onclick="sharePost(this)" data-id="<%= post.id %>" data-sharer="<%= currentUser._id %>" data-poster="<%= post.user._id %>"><i class="fa fa-share fa-lg"></i> <%= post.shares.length %></a>
           <div class="dropup">
             <a href="#" class="btn card-link text-muted"data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-h fa-lg"></i></a>
             <div class="dropdown-menu dropdown-menu-right">
               <h6 class="dropdown-header text-dark">Action</h6>
-              <a href="#" class="btn" data-toggle="modal" data-target="#editPostModal">Edit</a>
               <% if(post.user._id.toString() === currentUser._id.toString()) {%>
                 <form method="post" action="/post/<%=post._id%>?_method=DELETE">
                   <input type="hidden" name="_csrf" value="<%= csrf %>">        
@@ -45,10 +73,10 @@
             </div>
         </div>
       </div>
-      </div>
-    </div>
   </div>
 </div>
+</div>
+
 <div class="card" id="comments">
   <div class="card-body">
     <!-- <h5>comments</h5> -->
@@ -61,6 +89,7 @@
           <div id="commentResponse"></div>
           <input type="hidden" name="_csrf" value="<%= csrf %>">
           <input type="hidden" name="postId" id="postId" value="<%= post._id %>">
+          <input type="hidden" id="posterId" name="posterId" value="<%= post.user._id %>">
           <input type="hidden" name="userId" id="userId" value="<%= currentUser._id %>">
           <textarea class="form-control" name="comment" id="comment" placeholder="Enter comment here..."></textarea>
           <button type="submit" class="mt-3 btn btn-primary">Comment</button>
@@ -77,10 +106,10 @@
         <img src="<%= comment.user.avatar %>" class="rounded-circle align-self-start mr-3" alt="..." width="50px" height="50px">
           <div class="media-body">
             <h5 class="my-0"><a href="/user/<%= comment.user._id %>" class="text-primary font-weight-normal"><%= comment.user.fullname %></a></h5>
-            <p class="mb-3 text-muted">2 hours ago</p>
+            <p class="mb-3 text-muted date"><%= comment.createdAt %></p>
             <p class=""><%- comment.text %></p>
             <div class="d-flex justify-content-around">
-              <a href="#" class="card-link text-muted"><i class="fa fa-heart-o fa-lg"></i> 43</a>
+              <a href="#like" data-commentid="<%= comment._id %>" data-postid="<%= post._id %>" data-liker="<%= currentUser._id %>" data-poster="<%= comment.user._id %>" onclick="toggleLike(this, 'comment')" class="card-link text-muted"><i class="<%= comment.likers.includes(currentUser._id) ? 'fa fa-heart text-danger' : 'fa fa-heart-o' %> fa-lg"></i> <span><%= comment.likers.length %></span></a>
               <div class="dropup">
                 <a href="#" class="card-link text-muted"data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-h fa-lg"></i></a>
                 <div class="dropdown-menu dropdown-menu-right">
@@ -90,6 +119,7 @@
                       <input type="hidden" name="_csrf" value="<%= csrf %>">
                       <input type="hidden" id="commentId" name="commentId" value="<%= comment._id %>">
                       <input type="hidden" id="postId" name="postId" value="<%= post._id %>">
+                      <!-- <input type="hidden" id="posterId" name="posterId" value="<%= post.user._id %>"> -->
                       <input type="hidden" id="userId" name="userId" value="<%= currentUser._id %>">
                       <button type="submit" class="btn">Delete</button>
                     </form>

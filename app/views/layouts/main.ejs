@@ -1,63 +1,148 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';base-uri 'self';form-action 'self  *;"> -->
-    <!-- <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous"> -->
-    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous"> -->
-    <link rel="stylesheet" type="text/css" href="/public/css/bootstrap.min.css">
-    <link rel="stylesheet" type="text/css" href="/public/css/custom.css">
-    <title>Prestol &bull; <%= title %></title>
-  </head>
-  <body style="background-color: #e1e2e3;" data-userid="<%= currentUser._id %>">
-    <%- include("../partials/topbar", { user: currentUser }); %>
-    <div class="container">
-        <div class="row">
-        <div class="col-lg-6 mb-3">
-            <%- body %>
-        </div>
-        <div class="col-lg-6">
-            <h4 class="font-weight-bold">People to follow</h4>
-            <%if(usersToFollow.length < 1){%>
-                <h4 class="mt-3 text-center text-dark">Uhmm... No people to follow</h4>
-            <%} else {%>
-            <% usersToFollow.map(user => {%>
-            <div class="card">
-                <div class="card-body">
-                    <div class="media">
-                      <img src="<%= user.avatar %>" width="50px" height="50px" class="mr-3 rounded-circle" alt="...">
-                      <div class="media-body">
-                        <h6 class="mt-0 font-weight-bold"><a href="/user/<%= user._id %>" class="text-dark"><%- user.fullname %></a></h6>
-                        <button class="btn btn-primary btn-sm" data-fuser="<%= user._id %>" data-cuser="<%= currentUser._id %>" onclick="toggleFollow(this)"><%= user.followers.includes(currentUser._id) ? "unfollow" : "follow" %></button>
-                      </div>
+    <head>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, shrink-to-fit=no"
+        />
+        <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; connect-src 'self'; img-src 'self'; style-src 'self';base-uri 'self';form-action 'self  *;"> -->
+        <link
+            rel="stylesheet"
+            href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+            integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN"
+            crossorigin="anonymous"
+        />
+        <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css" integrity="sha384-TX8t27EcRE3e/ihU7zmQxVncDAy5uIKz4rEkgIXeMed4M0jlfIDPvg6uqKI2xXr2" crossorigin="anonymous"> -->
+        <link
+            rel="stylesheet"
+            type="text/css"
+            href="/public/css/bootstrap.min.css"
+        />
+        <link rel="stylesheet" type="text/css" href="/public/css/custom.css" />
+        <title>Prestol &bull; <%= title %></title>
+    </head>
+    <body
+        style="background-color: #e1e2e3"
+        data-userid="<%= currentUser._id %>"
+    >
+        <%- include("../partials/topbar", { user: currentUser }); %>
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-3 d-none d-lg-block">
+                    <h4 class="font-weight-bold">Shortcut</h4>
+                    <div class="card">
+                        <div class="card-body">
+                            <p>
+                                <a href="/notifications" class="text-dark"
+                                    ><i class="fa fa-bell-o"></i> Notifications
+                                    <span
+                                        class="badge badge-danger rounded-circle"
+                                        ><%= notifsCount %></span
+                                    ></a
+                                >
+                            </p>
+                            <p>
+                                <a
+                                    href="/user/<%- currentUser._id %>"
+                                    class="text-dark"
+                                    ><i class="fa fa-user-circle-o"></i>
+                                    Account</a
+                                >
+                            </p>
+                        </div>
                     </div>
                 </div>
+                <div class="col-lg-6 mb-3"><%- body %></div>
+                <div class="col-lg-3">
+                    <h4 class="font-weight-bold">People to follow</h4>
+                    <%if(usersToFollow.length < 1){%>
+                    <p class="mt-3 text-center text-dark">
+                        Uhmm... looks like You've followed everybody
+                    </p>
+                    <%} else {%> <% usersToFollow.map(user => {%>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="media">
+                                <img
+                                    src="<%= user.avatar %>"
+                                    width="50px"
+                                    height="50px"
+                                    class="mr-3 rounded-circle"
+                                    alt="..."
+                                />
+                                <div class="media-body">
+                                    <h6 class="mt-0 font-weight-bold">
+                                        <a
+                                            href="/user/<%= user._id %>"
+                                            class="text-dark"
+                                            ><%- user.fullname %></a
+                                        >
+                                    </h6>
+                                    <button
+                                        class="btn btn-primary btn-sm"
+                                        data-fuser="<%= user._id %>"
+                                        data-cuser="<%= currentUser._id %>"
+                                        onclick="toggleFollow(this)"
+                                    >
+                                        <%=
+                                        user.followers.includes(currentUser._id)
+                                        ? "unfollow" : "follow" %>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <%})}%>
+                </div>
             </div>
-            <%})}%>
         </div>
-        </div>
-    </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.0/axios.min.js" integrity="sha512-DZqqY3PiOvTP9HkjIWgjO6ouCbq+dxqWoJZ/Q+zPYNHmlnI2dQnbJ5bxAHpAMw+LXRm4D72EIRXzvcHQtE8/VQ==" crossorigin="anonymous"></script>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-    <script  src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js" integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s" crossorigin="anonymous"></script>
-    <script src="https://kit.fontawesome.com/dfa9d62489.js" crossorigin="anonymous"></script>
-    <!-- <script src="https://unpkg.com/timeago.js@4.0.2/dist/timeago.min.js"></script> -->
-    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js" integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ==" crossorigin="anonymous"></script> -->
-    <script src="/socket.io/socket.io.js"></script>
-    <!-- <script type="module" src="/public/js/io.js"></script> -->
-    <script>
-        const socket = io();
-        // let dates = document.querySelectorAll(".date").innerText
-        // let post = document.querySelectorAll(".truncate-post").innerHTML
-        // timeago.format(dates, 'en_US')
-        // dates = moment(dates).fromNow()
-        // post = post.length > 150 ? post.substr(0, 150) : post 
-    </script>
-    <script  src="/public/js/io.js"></script>
-    <script  src="/public/js/io/like.js"></script>
-    <script src="/public/js/io/comment.js"></script>
-    <script src="/public/js/main.js"></script>
-  </body>
-  </html>
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.0/axios.min.js"
+            integrity="sha512-DZqqY3PiOvTP9HkjIWgjO6ouCbq+dxqWoJZ/Q+zPYNHmlnI2dQnbJ5bxAHpAMw+LXRm4D72EIRXzvcHQtE8/VQ=="
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+            integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+            integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.min.js"
+            integrity="sha384-w1Q4orYjBQndcko6MimVbzY0tgp4pWB4lZ7lr30WKz0vr/aWKhXdBNmNb5D92v7s"
+            crossorigin="anonymous"
+        ></script>
+        <script
+            src="https://kit.fontawesome.com/dfa9d62489.js"
+            crossorigin="anonymous"
+        ></script>
+        <!-- <script src="https://unpkg.com/timeago.js@4.0.2/dist/timeago.min.js"></script> -->
+        <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"
+            integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ=="
+            crossorigin="anonymous"
+        ></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <!-- <script type="module" src="/public/js/io.js"></script> -->
+        <script>
+            const socket = io();
+            let dates = document.querySelectorAll(".date");
+            // let post = document.querySelectorAll(".truncate-post").innerHTML
+            // timeago.format(dates, 'en_US')
+            for (var i in dates) {
+                dates[i].innerText = moment(dates[i].innerText).fromNow();
+                console.log(dates[i].innerText);
+            }
+            // post = post.length > 150 ? post.substr(0, 150) : post
+        </script>
+        <script src="/public/js/io.js"></script>
+        <script src="/public/js/io/like.js"></script>
+        <script src="/public/js/io/comment.js"></script>
+        <script src="/public/js/main.js"></script>
+    </body>
+</html>

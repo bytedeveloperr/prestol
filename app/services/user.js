@@ -59,7 +59,10 @@ module.exports = {
 	getUser: async (_id) => {
 		try {
 			let user = await UserModel.findOne({ _id })
-				.populate({ path: "posts", populate: { path: "user" } })
+				.populate({
+					path: "posts",
+					populate: [{ path: "user" }, { path: "original" }],
+				})
 				.exec();
 			if (!user) {
 				return response({

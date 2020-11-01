@@ -1,10 +1,38 @@
 <div class="card text-wrap text-break">
   <div class="card-body">
     <div class="media">
-      <img src="<%= post.user.avatar %>" class="rounded-circle align-self-start mr-3" alt="..." width="50px" height="50px">
+      <img src="<%= post.user.avatar %>" class="rounded-circle align-self-start mr-3" alt="<%= post.user.fullname %>" width="40px" height="40px">
       <div class="media-body">
-        <h5 class="my-0"><a href="/user/<%= post.user._id %>" class="text-primary font-weight-normal"><%= post.user.fullname %></a></h5>
+        <h5 class="my-0"><a href="/user/<%= post.user._id %>" class="text-primary font-weight-normal"><%= post.user.fullname %></a> <small class="text-muted"><%= post.type == "shared" ? "shared a post" : "" %></small></h5>
         <p class="mb-3 text-muted date"><%- post.createdAt %></p>
+    </div><!-- media body -->
+  </div>
+  <div>
+    <% if(post.type == "shared"){%>
+            <hr class="mt-0 mb-2" />
+            <div class="">
+              <div class="media">
+                <img src="<%= post.original.user.avatar %>" class="rounded-circle align-self-start mr-3" alt="<%= post.user.fullname %>" width="40px" height="40px">
+                <div class="media-body">
+                  <h5 class="my-0"><a href="/user/<%= post.original.user._id %>" class="text-primary font-weight-normal"><%= post.user.fullname %></a></h5>
+                  <p class="mb-3 text-muted date"><%- post.original.createdAt %></p>
+                </div>
+              </div>
+              <p class="truncate-post"><a href="/post/<%= post.original._id %>" class="text-dark"><%- post.original.text.length > 200 ? post.original.text.substr(0, 200) + "..." : post.original.text %></a></p>
+              <div class="row">
+              <% if(post.original.image !== "") { %>
+                  <div class="col-12">
+                      <img src="<%- post.original.image %>" width="100%" height="300px" />
+                  </div>
+              <%}%>
+              <% if(post.original.video !== "") { %>
+                  <div class="col-12">
+                      <video class="mt-2" src="<%- post.original.video %>" controls width="100%" height="300px" ></video>
+                  </div>
+              <%}%>
+              </div>
+            </div>
+        <%} else{%>
         <p class="truncate-post"><a href="/post/<%= post._id %>" class="text-dark"><%- post.text.length > 200 ? post.text.substr(0, 200) + "..." : post.text %></a></p>
         <div class="row">
         <% if(post.image !== "") { %>
@@ -18,14 +46,15 @@
             </div>
         <%}%>
         </div>
+        <%}%>
         <hr />
         <div class="d-flex justify-content-around">
-          <a onclick="toggleLike(this)" data-id="<%= post._id %>" data-liker="<%= currentUser._id %>" data-poster="<%= post.user._id %>" class="card-link text-muted btn">
-            <i class="<%= post.likers.includes(currentUser._id) ? 'fa fa-heart text-danger' : 'fa fa-heart-o' %> fa-lg"></i> 
+          <a onclick="toggleLike(this, 'post')" data-postid="<%= post._id %>" data-liker="<%= currentUser._id %>" data-poster="<%= post.user._id %>" class="card-link text-muted btn">
+            <i class="<%= post.likers.includes(currentUser._id) ? 'fa fa-heart text-danger' : 'fa fa-heart-o' %> fa-lg"  id="icon<%= post._id %>"></i> 
             <span id="commentCount"><%= post.likers.length %></span>
           </a>
           <a href="/post/<%= post._id %>#comments" class="btn card-link text-muted"><i class="fa fa-comment-o fa-lg"></i> <span class="commentSpan"><%= post.comments.length %></span></a>
-          <a href="#" class="card-link text-muted btn"><i class="fa fa-share fa-lg"></i> 43</a>
+          <a href="#" class="card-link text-muted btn <%= post.type == "shared" ? "disabled": "" %>" onclick="sharePost(this)" data-id="<%= post.id %>" data-sharer="<%= currentUser._id %>" data-poster="<%= post.user._id %>"><i class="fa fa-share fa-lg"></i> <%= post.shares.length %></a>
           <div class="dropup">
             <a href="#" class="btn card-link text-muted"data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-h fa-lg"></i></a>
             <div class="dropdown-menu dropdown-menu-right">
@@ -42,7 +71,6 @@
             </div>
         </div>
       </div>
-    </div>
   </div>
 </div>
 </div>

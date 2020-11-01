@@ -1,25 +1,32 @@
-function toggleLike(self) {
+function toggleLike(self, type) {
 	let userId = self.getAttribute("data-poster");
-	let postId = self.getAttribute("data-id");
 	let likerId = self.getAttribute("data-liker");
-	let likeIcon = self.querySelector("i");
-	let likes = parseInt(self.querySelector("span").innerText);
+	let postId = self.getAttribute("data-postid");
+	let likeIcon = document.getElementById(`icon${postId}`);
+	let payload = { userId, likerId, postId };
+	console.log(likeIcon);
 
-	let payload = { userId, postId, likerId };
-
-	socket.emit("toggleLike", payload);
+	if (type == "post") {
+		socket.emit("togglePostLike", payload);
+	} else if (type == "comment") {
+		let commentId = self.getAttribute("data-commentid");
+		payload.commentId = commentId;
+		socket.emit("toggleCommentLike", payload);
+	}
 
 	socket.on("toggleLike", function (message) {
 		if (message === "liked") {
+			console.log(likeIcon);
 			likeIcon.className = "text-danger fa-lg fa fa-heart";
-			likes++;
-			self.querySelector("span").innerText = likes;
+			// likes++;
+			// self.querySelector("span").innerText = likes;
 			return;
 		}
 		if (message === "unliked") {
+			console.log(likeIcon);
 			likeIcon.className = "fa-lg fa fa-heart-o";
-			likes--;
-			self.querySelector("span").innerText = likes;
+			// likes--;
+			// self.querySelector("span").innerText = likes;
 			return;
 		}
 	});
@@ -45,4 +52,25 @@ function toggleFollow(self) {
 	});
 
 	console.log(self);
+}
+
+function sharePost(self) {
+	let userId = self.getAttribute("data-poster");
+	let postId = self.getAttribute("data-id");
+	let sharerId = self.getAttribute("data-sharer");
+	let shareIcon = self.querySelector("i");
+	// let likes = parseInt(self.querySelector("span").innerText);
+
+	let payload = { userId, postId, sharerId };
+
+	socket.emit("sharePost", payload);
+
+	socket.on("sharePost", function (message) {
+		if (message === "success") {
+			self.classList.add("disabled");
+			shareIcon.classList.add("text-success");
+			console.log("success");
+			return;
+		}
+	});
 }

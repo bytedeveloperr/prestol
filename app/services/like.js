@@ -6,7 +6,7 @@ const xss = require("xss");
 const { notify } = require("./notification");
 
 module.exports = {
-	toggleLike: async (data, { io, socket }) => {
+	togglePostLike: async (data, { io, socket }) => {
 		try {
 			let isLiked = await PostModel.findOne({
 				_id: data.postId,
@@ -37,6 +37,52 @@ module.exports = {
 						receiver: data.userId,
 						actor: data.likerId,
 						type: "postLike",
+						entity: { _id: data.postId },
+						entityType: "post",
+					});
+					if (!notif.error) {
+						io.to(data.userId).emit("newNotification", notif.data);
+					}
+				} else {
+					io.to(socket.id).emit("toggleLike", "error");
+				}
+			}
+		} catch (e) {
+			io.to(socket.id).emit("toggleLike", "error");
+		}
+	},
+
+	toggleCommentLike: async (data, { io, socket }) => {
+		try {
+			let isLiked = await CommentModel.findOne({
+				_id: data.commentId,
+				likers: data.likerId,
+			});
+			if (isLiked) {
+				let unlike = await CommentModel.updateOne(
+					{ _id: data.commentId },
+					{ $pull: { likers: data.likerId } }
+				);
+				if (unlike) {
+					io.to(socket.id).emit("toggleLike", "unliked");
+					// io.emit("gentoggleLike", "unliked");
+				} else {
+					io.to(socket.id).emit(
+						"likeError",
+						"An error occured, please try again"
+					);
+				}
+			} else {
+				let like = await CommentModel.updateOne(
+					{ _id: data.commentId },
+					{ $push: { likers: data.likerId } }
+				);
+				if (like) {
+					io.to(socket.id).emit("toggleLike", "liked");
+					let notif = await notify({
+						receiver: data.userId,
+						actor: data.likerId,
+						type: "commentLike",
 						entity: { _id: data.postId },
 						entityType: "post",
 					});

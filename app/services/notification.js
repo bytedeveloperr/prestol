@@ -6,12 +6,20 @@ module.exports = {
 	notify: async (data) => {
 		try {
 			let actor = await UserModel.findOne({ _id: data.actor });
-			if (data.type == "postLike") {
-				data.content = `${actor.fullname} likes your post.`;
-			} else if (data.type == "userFollow") {
-				data.content = `${actor.fullname} followed you`;
-			}
+
 			if (actor._id.toString() !== data.receiver.toString()) {
+				if (data.type == "postLike") {
+					data.content = `${actor.fullname} liked your post.`;
+				} else if (data.type == "userFollow") {
+					data.content = `${actor.fullname} followed you`;
+				} else if (data.type == "postShare") {
+					data.content = `${actor.fullname} shared your post`;
+				} else if (data.type == "postComment") {
+					data.content = `${actor.fullname} commented your post`;
+				} else if (data.type == "commentLike") {
+					data.content = `${actor.fullname} liked your comment`;
+				}
+
 				let Notification = new NotificationModel(data);
 				Notification = await Notification.save();
 				if (Notification) {
@@ -40,6 +48,12 @@ module.exports = {
 						error: true,
 					});
 				}
+			} else {
+				return response({
+					msg: "cannot notify an actor",
+					data: "",
+					error: true,
+				});
 			}
 		} catch (e) {
 			return response({

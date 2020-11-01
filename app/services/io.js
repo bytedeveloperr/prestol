@@ -2,6 +2,7 @@ const comment = require("./comment");
 const like = require("./like");
 const notif = require("./notification");
 const user = require("./user");
+const post = require("./post");
 
 module.exports = (io) => {
 	io.on("connection", (socket) => {
@@ -21,13 +22,23 @@ module.exports = (io) => {
 		});
 
 		// listen to post like
-		socket.on("toggleLike", (data) => {
-			like.toggleLike(data, { io, socket });
+		socket.on("togglePostLike", (data) => {
+			like.togglePostLike(data, { io, socket });
+		});
+
+		// listen to comment like
+		socket.on("toggleCommentLike", (data) => {
+			like.toggleCommentLike(data, { io, socket });
 		});
 
 		// listen to user follow
 		socket.on("toggleFollow", (data) => {
 			user.toggleFollow(data, { io, socket });
+		});
+
+		// listen to user follow
+		socket.on("sharePost", (data) => {
+			post.sharePost(data, { io, socket });
 		});
 
 		socket.on("markNotifAsRead", (id) => {
