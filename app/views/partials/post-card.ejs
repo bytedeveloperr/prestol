@@ -14,7 +14,7 @@
               <div class="media">
                 <img src="<%= post.original.user.avatar %>" class="rounded-circle align-self-start mr-3" alt="<%= post.user.fullname %>" width="40px" height="40px">
                 <div class="media-body">
-                  <h5 class="my-0"><a href="/user/<%= post.original.user._id %>" class="text-primary font-weight-normal"><%= post.user.fullname %></a></h5>
+                  <h5 class="my-0"><a href="/user/<%= post.original.user._id %>" class="text-primary font-weight-normal"><%= post.original.user.fullname %></a></h5>
                   <p class="mb-3 text-muted date"><%- post.original.createdAt %></p>
                 </div>
               </div>
